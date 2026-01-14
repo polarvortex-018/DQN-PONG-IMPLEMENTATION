@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+venv-linux/
+venv-windows/
+env/
+ENV/
+
+# Training outputs
+checkpoints/
+*.h5
+*.weights.h5
+logs/
+*.log
+training_logs/
+tensorboard/
+videos/
+*.mp4
+
+# Model files
+models/
+saved_models/
+
+# Data
+*.npy
+*.npz
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment
+.env
+.envrc
+
+# Large files
+*.zip
+*.tar.gz
+*.rar
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# ROM files (if any)
+*.bin
+*.a26
