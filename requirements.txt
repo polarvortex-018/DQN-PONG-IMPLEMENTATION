@@ -1,0 +1,25 @@
+# Core Dependencies
+tensorflow>=2.13.0          # Deep learning framework (install "tensorflow[and-cuda]" for GPU)
+gymnasium[atari]>=0.29.0    # RL environments (includes Atari games)
+gymnasium[accept-rom-license]>=0.29.0  # Auto-accept Atari ROM license
+shimmy[atari]>=0.3.0        # Required for Gymnasium Atari support
+
+# Atari ROM support
+ale-py>=0.8.1              # Arcade Learning Environment
+
+# Numerical and visualization
+numpy>=1.24.0              # Numerical operations
+matplotlib>=3.7.0          # Plotting and visualization
+pillow>=10.0.0             # Image processing
+opencv-python-headless>=4.8.0 # Headless version avoids common libGL errors in WSL2
+
+# Progress tracking
+tqdm>=4.65.0               # Progress bars
+
+# Jupyter support (optional, for exploration)
+jupyter>=1.0.0
+ipykernel>=6.25.0
+
+# Utilities
+imageio>=2.31.0            # Save videos/GIFs of agent playing
+imageio-ffmpeg>=0.4.9      # Video encoding
