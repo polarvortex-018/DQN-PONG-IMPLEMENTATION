@@ -178,8 +178,9 @@ class Trainer:
             # Take action
             next_state, reward, done, info = self.env.step(action)
             
-            # Store experience
-            self.replay_buffer.add(state, action, reward, next_state, done)
+            # Store experience (uint8 single frame for memory efficiency)
+            frame_uint8 = self.env.get_last_frame_uint8()
+            self.replay_buffer.add(frame_uint8, action, reward, done)
             
             # Train if we have enough experiences
             if self.replay_buffer.is_ready(config.MIN_REPLAY_SIZE):

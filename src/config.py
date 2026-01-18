@@ -51,7 +51,7 @@ NUM_ACTIONS = 6           # Will be set dynamically from environment
 # ============================================================================
 
 # Learning rate - how much to update network weights each step
-LEARNING_RATE = 0.0005    # Conservative - prevents divergence (was 0.001, too high!)
+LEARNING_RATE = 0.001    # Conservative - prevents divergence (was 0.001, too high!)
                           # Large value = fast but unstable learning
                           # 0.00025 is proven to work well for Atari
 
@@ -61,17 +61,17 @@ GAMMA = 0.99              # 0.99 = care about long-term rewards
                           # Higher gamma = more strategic play
 
 # Batch size - number of experiences to train on at once
-BATCH_SIZE = 32           # Optimal for 16GB RAM + RTX 3050
+BATCH_SIZE = 64           # Optimal for 16GB RAM + RTX 3050
                           # - Speed (larger = faster but more memory)
                           # - Stability (smaller = more stable updates)
 
 # Replay buffer size - how many past experiences to remember
-REPLAY_BUFFER_SIZE = 30000  # Balanced for 12GB WSL2 - tested safe limit
+REPLAY_BUFFER_SIZE = 100000  # uint8 storage enables 2.6x larger buffer!
                              # Larger = more diverse training data
                              # Smaller = faster but less diverse
 
 # Minimum experiences before training starts
-MIN_REPLAY_SIZE = 7500    # 25% of buffer - good diversity
+MIN_REPLAY_SIZE = 25000   # 25% of buffer - ensures good diversity
                           # This ensures diverse initial data
 
 # Target network update frequency
@@ -86,7 +86,7 @@ TARGET_UPDATE_FREQ = 5000   # Faster updates for smaller buffer - better learnin
 # Epsilon controls exploration vs exploitation
 EPSILON_START = 1.0       # Start with 100% random actions (full exploration)
 EPSILON_END = 0.01        # End with 1% random actions (maximum exploitation)
-EPSILON_DECAY = 0.995     # Balanced decay - explores well, then exploits
+EPSILON_DECAY = 0.99     # Balanced decay - explores well, then exploits
 
 # Epsilon decay schedule example:
 # Episode 1: ε = 1.0 (100% random)

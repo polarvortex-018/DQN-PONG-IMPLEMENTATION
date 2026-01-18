@@ -82,7 +82,7 @@ class PongEnvironment:
             self.frame_stack.append(processed_frame)
         
         # Stack frames along last dimension: (84, 84, 4)
-        state = np.stack(self.frame_stack, axis=-1)
+        state = np.stack(self.frame_stack, axis=-1).astype(np.float32)
         
         return state
     
@@ -119,7 +119,7 @@ class PongEnvironment:
         self.frame_stack.append(processed_frame)
         
         # Stack frames to create state
-        next_state = np.stack(self.frame_stack, axis=-1)
+        next_state = np.stack(self.frame_stack, axis=-1).astype(np.float32)
         
         # Clip reward to -1, 0, +1 for stability
         # (Large rewards can cause unstable learning)
@@ -193,6 +193,25 @@ class PongEnvironment:
         """Render the environment (if render_mode was set)."""
         # Rendering is handled automatically by Gymnasium
         pass
+    
+    def get_last_frame_uint8(self):
+        """
+        Get the most recent processed frame as uint8.
+        
+        This is used for memory-efficient replay buffer storage.
+        The frame is converted from float32 [0,1] back to uint8 [0-255].
+        
+        Returns:
+            numpy array: (84, 84) uint8 frame
+        """
+        if len(self.frame_stack) == 0:
+            raise ValueError("No frames in stack yet - call reset() first")
+        
+        # Get last frame and convert float32 → uint8
+        last_frame = self.frame_stack[-1]
+        frame_uint8 = (last_frame * 255).astype(np.uint8)
+        
+        return frame_uint8
 
 
 def test_environment():
