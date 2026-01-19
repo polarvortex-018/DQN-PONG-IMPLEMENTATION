@@ -344,7 +344,18 @@ class Trainer:
         self.agent.load(path)
         
         # Try to load training state
-        state_path = path.replace('.h5', '_state.json')
+        # Handle both .h5 and .weights.h5 extensions
+        state_path = path.replace('.weights.h5', '_state.json').replace('.h5', '_state.json')
+        
+        # Also try the training_state_episode_N.json format
+        import re
+        match = re.search(r'episode_(\d+)', path)
+        if match:
+            episode_num = match.group(1)
+            alt_state_path = os.path.join(os.path.dirname(path), f'training_state_episode_{episode_num}.json')
+            if os.path.exists(alt_state_path):
+                state_path = alt_state_path
+        
         if os.path.exists(state_path):
             with open(state_path, 'r') as f:
                 state = json.load(f)
@@ -352,6 +363,9 @@ class Trainer:
             self.total_steps = state['total_steps']
             self.best_reward = state['best_reward']
             print(f"Resumed from episode {self.episode}")
+        else:
+            print(f"Warning: Could not find training state file at {state_path}")
+            print("Starting episode counter from 0")
 
 
 def main():

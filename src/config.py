@@ -51,7 +51,7 @@ NUM_ACTIONS = 6           # Will be set dynamically from environment
 # ============================================================================
 
 # Learning rate - how much to update network weights each step
-LEARNING_RATE = 0.001    # Conservative - prevents divergence (was 0.001, too high!)
+LEARNING_RATE = 0.0005    # Increased from 0.00025 - balance between stability and progress
                           # Large value = fast but unstable learning
                           # 0.00025 is proven to work well for Atari
 
@@ -61,21 +61,21 @@ GAMMA = 0.99              # 0.99 = care about long-term rewards
                           # Higher gamma = more strategic play
 
 # Batch size - number of experiences to train on at once
-BATCH_SIZE = 64           # Optimal for 16GB RAM + RTX 3050
+BATCH_SIZE = 32           # Stable gradient updates (was 64, too noisy)
                           # - Speed (larger = faster but more memory)
                           # - Stability (smaller = more stable updates)
 
 # Replay buffer size - how many past experiences to remember
-REPLAY_BUFFER_SIZE = 100000  # uint8 storage enables 2.6x larger buffer!
+REPLAY_BUFFER_SIZE = 80000  # Proven stable size with uint8 storage
                              # Larger = more diverse training data
                              # Smaller = faster but less diverse
 
 # Minimum experiences before training starts
-MIN_REPLAY_SIZE = 25000   # 25% of buffer - ensures good diversity
+MIN_REPLAY_SIZE = 20000   # 25% of buffer - ensures diversity
                           # This ensures diverse initial data
 
 # Target network update frequency
-TARGET_UPDATE_FREQ = 5000   # Faster updates for smaller buffer - better learning
+TARGET_UPDATE_FREQ = 10000  # Conservative - more stable learning
                             # More frequent = less stable
                             # Less frequent = slower to adapt
 
@@ -86,7 +86,7 @@ TARGET_UPDATE_FREQ = 5000   # Faster updates for smaller buffer - better learnin
 # Epsilon controls exploration vs exploitation
 EPSILON_START = 1.0       # Start with 100% random actions (full exploration)
 EPSILON_END = 0.01        # End with 1% random actions (maximum exploitation)
-EPSILON_DECAY = 0.99     # Balanced decay - explores well, then exploits
+EPSILON_DECAY = 0.995     # Slower decay - better exploration before exploiting
 
 # Epsilon decay schedule example:
 # Episode 1: ε = 1.0 (100% random)

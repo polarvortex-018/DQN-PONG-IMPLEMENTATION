@@ -28,10 +28,10 @@ python src/train.py --episodes 1000
 ### Resume Training from Checkpoint
 ```bash
 # Resume from a specific checkpoint
-python src/train.py --resume checkpoints/dqn_pong_episode_100.h5
+python src/train.py --resume checkpoints/dqn_pong_episode_100.weights.h5
 
 # Resume from interrupted training
-python src/train.py --resume checkpoints/dqn_pong_interrupted.h5
+python src/train.py --resume checkpoints/dqn_pong_interrupted.weights.h5
 ```
 
 ### Run Training in Background (Recommended for Overnight)
@@ -99,6 +99,25 @@ while true; do
   sleep 30;
 done
 ```
+
+### Check if Agent is Actually Learning (IMPORTANT!)
+```bash
+# Check current training progress
+python -c "import json; d=json.load(open('logs/training_log.json')); print('Current episode:', d['episodes_completed']); print('Loss values available:', len(d['losses'])); print('Training starts at episode 235'); print('Episodes to go:', max(0, 235 - d['episodes_completed']))"
+
+# Check if LOSS is decreasing (run after episode 300)
+python -c "import json, numpy as np; d=json.load(open('logs/training_log.json')); losses=d['losses']; n=len(losses); first_50=np.mean(losses[:50]); last_50=np.mean(losses[-50:]); print('Total loss values:', n); print('First 50 losses:', round(first_50, 4)); print('Last 50 losses:', round(last_50, 4)); change=last_50-first_50; print('Change:', round(change, 4)); print('Status:', 'LEARNING' if change < -0.0005 else 'PROBLEM' if change > 0.0005 else 'STABLE')"
+
+# Check if REWARDS are improving (run after episode 300)
+python -c "import json, numpy as np; d=json.load(open('logs/training_log.json')); r=d['episode_rewards']; print('Total episodes:', len(r)); first_100=np.mean(r[:100]); last_100=np.mean(r[-100:]); print('First 100 rewards:', round(first_100, 2)); print('Last 100 rewards:', round(last_100, 2)); print('Improvement:', round(last_100-first_100, 2))"
+```
+
+**What to Look For:**
+- Loss should be DECREASING (change is negative)
+- Rewards should be IMPROVING (getting less negative, or positive)
+- Status shows "LEARNING" = agent is working correctly ✅
+- Status shows "PROBLEM" = something wrong with training ❌
+
 
 ### Check GPU Usage
 ```bash
