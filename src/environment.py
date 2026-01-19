@@ -121,18 +121,115 @@ class PongEnvironment:
         # Stack frames to create state
         next_state = np.stack(self.frame_stack, axis=-1).astype(np.float32)
         
-        # Clip reward to -1, 0, +1 for stability
-        # (Large rewards can cause unstable learning)
-        clipped_reward = np.sign(total_reward)
+        # Apply reward shaping if enabled
+        if config.USE_REWARD_SHAPING:
+            shaped_reward = self._calculate_shaped_reward(obs, total_reward, processed_frame)
+        else:
+            shaped_reward = total_reward
         
         # Update statistics
-        self.episode_reward += total_reward
+        self.episode_reward += total_reward  # Track game score
         self.episode_length += 1
         
         # Combine done and truncated
         done = done or truncated
         
-        return next_state, clipped_reward, done, info
+        return next_state, shaped_reward, done, info
+    
+    def _calculate_shaped_reward(self, raw_obs, game_reward, processed_frame):
+        """
+        Calculate shaped reward with intermediate signals.
+        
+        Addresses sparse reward problem where 97% of frames have reward=0.
+        Adds small rewards for:
+        - Ball getting closer to opponent (+)
+        - Ball being near our paddle when we could hit it (+)
+        - Ball near our goal (-)
+        
+        Args:
+            raw_obs: Raw observation from environment (210x160 RGB)
+            game_reward: Original game reward (+1/-1/0)
+            processed_frame: Preprocessed grayscale frame
+            
+        Returns:
+            shaped_reward: Game reward + shaping bonuses
+        """
+        shaped = game_reward
+        
+        # Detect ball and paddle positions using simple heuristics
+        ball_x, ball_y = self._detect_ball(raw_obs)
+        paddle_y = self._detect_paddle(raw_obs)
+        
+        if ball_x is not None and ball_y is not None:
+            # Reward 1: Ball proximity to opponent side
+            # Field is ~160 pixels wide, ball at x>80 is opponent side
+            if ball_x > 80:
+                proximity_bonus = 0.005 * ((ball_x - 80) / 80)  # 0 to 0.005
+                shaped += proximity_bonus
+            else:
+                proximity_penalty = -0.005 * ((80 - ball_x) / 80)  # 0 to -0.005
+                shaped += proximity_penalty
+            
+            # Reward 2: Ball near our paddle (potential to hit)
+            if paddle_y is not None and ball_x < 40:  # Ball on our side
+                vertical_dist = abs(ball_y - paddle_y)
+                if vertical_dist < 20:  # Within hitting range
+                    contact_bonus = 0.01 * (1 - vertical_dist / 20)  # 0.01 to 0
+                    shaped += contact_bonus
+        
+        return shaped
+    
+    def _detect_ball(self, obs):
+        """
+        Detect ball position in raw Pong observation.
+        
+        Ball is a small white square (brightest object).
+        
+        Returns:
+            (x, y) tuple or (None, None) if not found
+        """
+        # Convert to grayscale for simpler detection
+        gray = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
+        
+        # Ball is the brightest pixels
+        threshold = 200
+        bright_pixels = np.where(gray > threshold)
+        
+        if len(bright_pixels[0]) > 0:
+            # Get center of bright region
+            y_coords = bright_pixels[0]
+            x_coords = bright_pixels[1]
+            
+            # Return centroid
+            ball_y = int(np.mean(y_coords))
+            ball_x = int(np.mean(x_coords))
+            
+            return ball_x, ball_y
+        
+        return None, None
+    
+    def _detect_paddle(self, obs):
+        """
+        Detect our paddle position (left side).
+        
+        Paddle is a vertical white rectangle on the left.
+        
+        Returns:
+            y position or None if not found
+        """
+        # Convert to grayscale
+        gray = cv2.cvtColor(obs, cv2.COLOR_RGB2GRAY)
+        
+        # Look for bright vertical line on left side
+        left_region = gray[:, :30]  # Left 30 pixels
+        bright = np.where(left_region > 200)
+        
+        if len(bright[0]) > 0:
+            # Return vertical center of paddle
+            paddle_y = int(np.mean(bright[0]))
+            return paddle_y
+        
+        return None
     
     def _preprocess_frame(self, frame):
         """

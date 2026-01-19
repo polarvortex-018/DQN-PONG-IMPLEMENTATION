@@ -173,7 +173,7 @@ NUM_ENVS = 1              # Start with 1, can increase for faster training
 # Pong gives sparse rewards: +1 for scoring, -1 for getting scored on
 # We can add small rewards to help learning
 
-USE_REWARD_SHAPING = False  # Set to True to enable
+USE_REWARD_SHAPING = True  # Set to True to enable
 
 # Small reward for hitting the ball
 BALL_HIT_REWARD = 0.1
@@ -272,6 +272,7 @@ def print_config():
     print(f"  GPU memory growth: {GPU_MEMORY_GROWTH}")
     print(f"  Mixed precision: {USE_MIXED_PRECISION}")
     print(f"  Double DQN: {USE_DOUBLE_DQN}")
+    print(f"  Use Reward Shaping: {USE_REWARD_SHAPING}")
     print("=" * 80)
 
 
