@@ -33,16 +33,16 @@ CartPole = {
 
 Pong = {
     'env_name': "pong",
-    'memory_size': 10000,
-    'n_episodes': 1000,
+    'memory_size': 100000,
+    'n_episodes': 3000,
     'batch_size': 32,
-    'target_update_frequency': 1000,
+    'target_update_frequency': 10000,
     'train_frequency': 4,
     'gamma': 0.99,
-    'lr': 1e-4,
+    'lr': 5e-5,
     'eps_start': 1.0,
     'eps_end': 0.01,
-    'anneal_length': 10**6,
+    'anneal_length': 3*10**6,
     'n_actions': 2,
     "obss_stack_size": 4,
 }

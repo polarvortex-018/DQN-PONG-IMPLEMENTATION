@@ -1,14 +1,18 @@
 import argparse
 
+import ale_py  # Must import before gymnasium to register ALE environments
 import gymnasium as gym
 import torch
+
+# Register ALE environments
+gym.register_envs(ale_py)
 
 import config
 from utils import preprocess
 from evaluate import evaluate_policy
 from dqn import DQN, ReplayMemory, optimize
 
-from gymnasium.wrappers import AtariPreprocessing, FrameStack
+from gymnasium.wrappers import AtariPreprocessing, FrameStackObservation as FrameStack
 
 import matplotlib.pyplot as plt
 

@@ -1,12 +1,17 @@
 import argparse
 
+import ale_py  # Must import before gymnasium to register ALE environments
 import gymnasium as gym
 import torch
 
+# Register ALE environments
+gym.register_envs(ale_py)
+
 import config
 from utils import preprocess
+from dqn import DQN
 
-from gymnasium.wrappers import AtariPreprocessing, FrameStack
+from gymnasium.wrappers import AtariPreprocessing, FrameStackObservation as FrameStack
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -77,8 +82,11 @@ def main():
     env_config = ENV_CONFIGS[args.env]
 
     if args.save_video:
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        video_folder = f'./video/{timestamp}/'
         env = gym.make(args.env, render_mode='rgb_array')
-        env = gym.wrappers.RecordVideo(env, './video/', episode_trigger=lambda episode_id: True)
+        env = gym.wrappers.RecordVideo(env, video_folder, episode_trigger=lambda episode_id: True)
         
     if args.env in ["ALE/Pong-v5"]:
         env = AtariPreprocessing(
@@ -86,7 +94,8 @@ def main():
         env = FrameStack(env, 4)
 
     # Load model from provided path.
-    dqn = torch.load(args.path, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+    
+    dqn = torch.load(args.path, weights_only=False, map_location=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
     dqn.eval()
 
     mean_return = evaluate_policy(dqn, env, env_config, args, args.n_eval_episodes, render=args.render and not args.save_video, verbose=True)

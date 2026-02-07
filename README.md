@@ -35,3 +35,8 @@ python evaluate.py --env ALE/Pong-v5 --path <path_to_model>
 ```
 
 Optional arguments `--n_eval_episodes` (number of evaluation episodes), `--render` (render the environment), and `--save_video` (save a video of the agent playing the game) can also be specified.
+
+This code was branched from a different person and for the love of me, I cant remember who. I made some minor changes to the config file to have it train for much longer and be very proficient at the game. Videos of the results of Pong are there in the folder "videos" taken at different stages of training.
+
+I found the file:  https://github.com/caspernorrbin/pong-dqn.git
+Huge thanks to this person for helping me get better at this!
