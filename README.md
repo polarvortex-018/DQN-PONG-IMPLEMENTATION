@@ -40,3 +40,9 @@ This code was branched from a different person and for the love of me, I cant re
 
 I found the file:  https://github.com/caspernorrbin/pong-dqn.git
 Huge thanks to this person for helping me get better at this!
+
+- Fixed FrameStackObservation imports for gymnasium v1.2.3
+- Added ale_py registration for ALE environments  
+- Fixed model saving with automatic directory creation
+- Added unique timestamp-based video naming
+- Fixed model loading in evaluate.py
